@@ -1,0 +1,19 @@
+# systemctl
+
+Коротко: управляет systemd-сервисами и показывает их состояние.
+
+Быстрые примеры:
+- `systemctl status nginx` — статус сервиса
+- `systemctl restart nginx` — перезапустить сервис
+- `systemctl stop nginx` — остановить сервис
+- `systemctl list-units --type=service` — показать активные сервисы
+
+Полезно помнить:
+- `status` — первая команда для диагностики
+- если сервис падает, сравни `systemctl status` и `journalctl -u <unit>`
+
+Проверь дальше:
+- `man systemctl`
+- `hman systemctl`
+- тема `~/linux-lab/tasks/03-processes`
+

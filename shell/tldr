@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HELP_DIR_DEFAULT="$HOME/.local/share/linux-lab/help"
+if [ -d "$SELF_DIR/help" ]; then
+  HELP_DIR_DEFAULT="$SELF_DIR/help"
+fi
+
+help_file_for() {
+  local topic="$1"
+  printf '%s/%s.txt\n' "$HELP_DIR_DEFAULT" "$topic"
+}
+
+print_help() {
+  local topic="$1"
+  local help_file
+  help_file="$(help_file_for "$topic")"
+
+  if [ -f "$help_file" ]; then
+    cat "$help_file"
+    return 0
+  fi
+
+  printf 'Локальная подсказка для "%s" не найдена.\n' "$topic" >&2
+  return 1
+}
+
+find_external_tldr() {
+  local candidate
+  local current_script
+
+  current_script="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+
+  for candidate in /usr/bin/tldr /usr/local/bin/tldr /usr/bin/tealdeer /usr/local/bin/tealdeer; do
+    if [ -x "$candidate" ] && [ "$candidate" != "$current_script" ]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+topic=""
+pass_args=()
+for arg in "$@"; do
+  pass_args+=("$arg")
+  case "$arg" in
+    --help|-h)
+      ;;
+    --language|--render|--theme|--config-path)
+      ;;
+    -*)
+      ;;
+    *)
+      topic="$arg"
+      ;;
+  esac
+done
+
+if [ -z "$topic" ]; then
+  echo "Linux Lab tldr:"
+  echo "  tldr find"
+  echo "  tldr chmod"
+  echo "  tldr ssh"
+  echo
+  echo "Если системный клиент tldr недоступен, будет показана локальная русская подсказка."
+  exit 0
+fi
+
+if external_tldr="$(find_external_tldr)"; then
+  if "$external_tldr" --language ru "$topic" 2>/dev/null; then
+    exit 0
+  fi
+
+  if "$external_tldr" "$topic" 2>/dev/null; then
+    exit 0
+  fi
+fi
+
+print_help "$topic"
+

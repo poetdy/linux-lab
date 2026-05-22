@@ -14,8 +14,39 @@ alias cls='clear'
 alias bat='batcat 2>/dev/null || bat'
 alias fd='fdfind 2>/dev/null || fd'
 
+linux_lab_help_dir() {
+  printf '%s\n' "$HOME/.local/share/linux-lab/help"
+}
+
+linux_lab_help_file() {
+  local topic="$1"
+  printf '%s/%s.txt\n' "$(linux_lab_help_dir)" "$topic"
+}
+
+linux_lab_print_local_help() {
+  local topic="$1"
+  local help_file
+
+  help_file="$(linux_lab_help_file "$topic")"
+  if [ -f "$help_file" ]; then
+    cat "$help_file"
+    return 0
+  fi
+
+  return 1
+}
+
 hman() {
-  LANG=ru_RU.UTF-8 man "$@"
+  if LANG=ru_RU.UTF-8 man "$@" 2>/dev/null; then
+    return 0
+  fi
+
+  if [ $# -gt 0 ] && linux_lab_print_local_help "$1"; then
+    return 0
+  fi
+
+  echo "Русская man-страница недоступна, и локальная подсказка не найдена."
+  return 1
 }
 
 h() {
@@ -30,11 +61,49 @@ h() {
     return
   fi
 
-  tldr --language ru "$1" 2>/dev/null || tldr "$1" 2>/dev/null || hman "$1"
+  if command -v tldr >/dev/null 2>&1 && tldr --language ru "$1" 2>/dev/null; then
+    return 0
+  fi
+
+  if command -v tldr >/dev/null 2>&1 && tldr "$1" 2>/dev/null; then
+    return 0
+  fi
+
+  if hman "$1"; then
+    return 0
+  fi
+
+  if linux_lab_print_local_help "$1"; then
+    return 0
+  fi
+
+  echo "Не удалось найти справку для '$1'."
+  return 1
 }
 
 hs() {
-  LANG=ru_RU.UTF-8 apropos "$@"
+  local query="$*"
+  local help_dir
+  local found=1
+
+  if LANG=ru_RU.UTF-8 apropos "$@" 2>/dev/null; then
+    found=0
+  fi
+
+  help_dir="$(linux_lab_help_dir)"
+  if [ -d "$help_dir" ]; then
+    if grep -RIl -- "$query" "$help_dir" >/dev/null 2>&1; then
+      echo
+      echo "Локальные подсказки Linux Lab:"
+      grep -RIl -- "$query" "$help_dir" | sed 's#.*/##; s#\.txt$##' | sort
+      found=0
+    fi
+  fi
+
+  if [ "$found" -ne 0 ]; then
+    echo "Ничего не найдено по запросу: $query"
+    return 1
+  fi
 }
 
 lab() {
@@ -134,4 +203,3 @@ menu() {
 if [[ $- == *i* ]] && [[ -n "${SSH_CONNECTION:-}" ]] && [ -x "$HOME/.local/bin/lab-welcome" ]; then
   "$HOME/.local/bin/lab-welcome"
 fi
-
