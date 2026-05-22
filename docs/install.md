@@ -22,7 +22,7 @@
 ## Как запустить
 
 ```bash
-git clone <repo-url> linux-lab-repo
+git clone https://github.com/poetdy/linux-lab.git linux-lab-repo
 cd linux-lab-repo
 bash install.sh
 exec bash
