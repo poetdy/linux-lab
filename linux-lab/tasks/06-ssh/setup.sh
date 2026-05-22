@@ -4,6 +4,7 @@ LAB="$HOME/linux-lab/broken/ssh-lab"
 rm -rf "$LAB"
 mkdir -p "$LAB/.ssh"
 printf 'ssh-ed25519 AAAATEST lab@local\n' > "$LAB/.ssh/authorized_keys"
+# Лабораторный ключ генерируется при setup и не хранится в репозитории.
 printf 'private-lab-key\n' > "$LAB/lab_id_ed25519"
 cat > "$LAB/config.sample" <<'EOF'
 Host labbox
