@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+echo
+echo "╔════════════════════════════════════════════════════════════╗"
+echo "║                    Linux Lab                              ║"
+echo "║      учебный полигон по Linux, SSH, CLI и диагностике     ║"
+echo "╚════════════════════════════════════════════════════════════╝"
+echo
+
+echo "Добро пожаловать."
+echo "Это практическая учебная среда, в которой можно тренировать команды,"
+echo "решать типовые задачи администратора и спокойно ошибаться внутри ~/linux-lab."
+echo ""
+echo "Среду развивает: Данилов Юрий (poet_dy)"
+echo
+
+echo "Система:"
+echo "  host:   $(hostname)"
+echo "  user:   $(whoami)"
+echo "  kernel: $(uname -r)"
+echo "  path:   $(pwd)"
+echo
+
+echo "С чего начать:"
+echo "  cd ~/linux-lab"
+echo "  sed -n '1,260p' README.md"
+echo "  lab"
+echo
+
+echo "Как проходить обучение:"
+echo "  1. Перейди в тему из ~/linux-lab/tasks/"
+echo "  2. Прочитай lesson.md"
+echo "  3. Запусти setup.sh"
+echo "  4. Выполни задания из practice.md"
+echo "  5. Сверься с checks.md"
+echo "  6. Запусти verify.sh"
+echo ""
+echo "Короткий пример:"
+echo "  cd ~/linux-lab/tasks/01-files"
+echo "  bash setup.sh"
+echo "  sed -n '1,200p' lesson.md"
+echo "  sed -n '1,240p' practice.md"
+echo "  bash verify.sh"
+echo
+
+echo "Если открываешь сервер спустя время или даешь его другу:"
+echo "  README.md в ~/linux-lab объясняет, как устроен полигон и в каком порядке идти."
+echo "  Рекомендуемый маршрут:"
+echo "  01-files -> 02-permissions -> 03-processes -> 04-network -> 05-logs -> 06-ssh -> 07-bash -> 08-docker"
+echo
+
+echo "Главные команды помощи:"
+echo "  lab             список учебных тем"
+echo "  h find          короткая справка tldr"
+echo "  hman chmod      русская man-страница"
+echo "  hs network      поиск по справке"
+echo "  ll              подробный список файлов"
+echo "  tree -L 2       дерево каталогов"
+echo "  ports           открытые порты"
+echo "  ip4             IPv4-адреса"
+echo
+
+echo "Полезно помнить:"
+echo "  - здесь нормально ошибаться и повторять упражнения несколько раз;"
+echo "  - лучше печатать команды руками, а не просто копировать;"
+echo "  - все учебные эксперименты старайся держать внутри ~/linux-lab."
+echo
+
+echo "Перед опасными экспериментами:"
+echo "  Сделай snapshot в Proxmox."
+echo
+

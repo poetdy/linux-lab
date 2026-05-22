@@ -1,0 +1,5 @@
+Host labbox
+    HostName 127.0.0.1
+    User trainee
+    IdentityFile /no/such/key
+    IdentitiesOnly yes
