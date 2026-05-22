@@ -97,11 +97,20 @@ install_packages() {
   run_root env DEBIAN_FRONTEND=noninteractive apt-get install -y "${packages[@]}"
 
   for package in "${optional_packages[@]}"; do
-    if apt-cache show "$package" >/dev/null 2>&1; then
-      log "Устанавливаю дополнительный пакет справки: $package"
-      run_root env DEBIAN_FRONTEND=noninteractive apt-get install -y "$package"
+    if ! apt-cache policy "$package" 2>/dev/null | grep -Eq 'Candidate:\s+\S'; then
+      continue
+    fi
+
+    if apt-cache policy "$package" 2>/dev/null | grep -Eq 'Candidate:\s+\(none\)'; then
+      continue
+    fi
+
+    log "Устанавливаю дополнительный пакет справки: $package"
+    if run_root env DEBIAN_FRONTEND=noninteractive apt-get install -y "$package"; then
       return
     fi
+
+    log "Не удалось установить дополнительный пакет $package. Продолжаю с локальным wrapper Linux Lab"
   done
 
   log "Системный пакет tldr не найден. Будет использоваться локальный wrapper Linux Lab"
