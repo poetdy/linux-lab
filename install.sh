@@ -6,6 +6,8 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LAB_SOURCE_DIR="$REPO_ROOT/linux-lab"
 WELCOME_SOURCE="$REPO_ROOT/shell/lab-welcome"
 HELPERS_SOURCE="$REPO_ROOT/shell/linux-lab.sh"
+LESSON_SOURCE="$REPO_ROOT/shell/lesson"
+LESSON_LIB_SOURCE="$REPO_ROOT/shell/lesson-runner-lib.sh"
 HELP_SOURCE_DIR="$REPO_ROOT/shell/help"
 TLDR_WRAPPER_SOURCE="$REPO_ROOT/shell/tldr"
 
@@ -15,7 +17,9 @@ TARGET_BIN_DIR="$TARGET_HOME/.local/bin"
 TARGET_SHARE_DIR="$TARGET_HOME/.local/share/linux-lab"
 TARGET_HELP_DIR="$TARGET_SHARE_DIR/help"
 TARGET_WELCOME="$TARGET_BIN_DIR/lab-welcome"
+TARGET_LESSON="$TARGET_BIN_DIR/lesson"
 TARGET_HELPERS="$TARGET_SHARE_DIR/linux-lab.sh"
+TARGET_LESSON_LIB="$TARGET_SHARE_DIR/lesson-runner-lib.sh"
 TARGET_TLDR="$TARGET_BIN_DIR/tldr"
 TARGET_BASHRC="$TARGET_HOME/.bashrc"
 
@@ -54,6 +58,7 @@ append_bashrc_block() {
 
   block=$(cat <<EOF
 $BASHRC_BEGIN
+export PATH="\$HOME/.local/bin:\$PATH"
 if [ -f "\$HOME/.local/share/linux-lab/linux-lab.sh" ]; then
   . "\$HOME/.local/share/linux-lab/linux-lab.sh"
 fi
@@ -132,7 +137,6 @@ ensure_russian_locale() {
 
 sync_lab_content() {
   log "Копирую учебный контент в $TARGET_LAB_DIR"
-  rm -rf "$TARGET_LAB_DIR"
   mkdir -p "$TARGET_LAB_DIR"
   cp -a "$LAB_SOURCE_DIR"/. "$TARGET_LAB_DIR"/
 }
@@ -141,7 +145,9 @@ install_shell_files() {
   log "Устанавливаю shell helper-файлы"
   mkdir -p "$TARGET_BIN_DIR" "$TARGET_SHARE_DIR" "$TARGET_HELP_DIR"
   install -m 0755 "$WELCOME_SOURCE" "$TARGET_WELCOME"
+  install -m 0755 "$LESSON_SOURCE" "$TARGET_LESSON"
   install -m 0644 "$HELPERS_SOURCE" "$TARGET_HELPERS"
+  install -m 0644 "$LESSON_LIB_SOURCE" "$TARGET_LESSON_LIB"
   install -m 0755 "$TLDR_WRAPPER_SOURCE" "$TARGET_TLDR"
   cp -a "$HELP_SOURCE_DIR"/. "$TARGET_HELP_DIR"/
 }
@@ -160,6 +166,8 @@ preflight() {
   [ -d "$LAB_SOURCE_DIR/tasks" ] || fail "не найден каталог $LAB_SOURCE_DIR/tasks"
   [ -f "$WELCOME_SOURCE" ] || fail "не найден $WELCOME_SOURCE"
   [ -f "$HELPERS_SOURCE" ] || fail "не найден $HELPERS_SOURCE"
+  [ -f "$LESSON_SOURCE" ] || fail "не найден $LESSON_SOURCE"
+  [ -f "$LESSON_LIB_SOURCE" ] || fail "не найден $LESSON_LIB_SOURCE"
   [ -d "$HELP_SOURCE_DIR" ] || fail "не найдена директория $HELP_SOURCE_DIR"
   [ -f "$TLDR_WRAPPER_SOURCE" ] || fail "не найден $TLDR_WRAPPER_SOURCE"
 }
@@ -175,6 +183,7 @@ main() {
   log "Установка завершена"
   log "Linux Lab установлен в $TARGET_LAB_DIR"
   log "Русская справка доступна через h, hman, hs и tldr"
+  log "Lesson runner доступен через команду lesson <topic>"
   log "Откройте новую shell-сессию или выполните: exec bash"
   log "После этого можно перейти в ~/linux-lab и начать с README.md"
 }

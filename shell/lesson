@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [ -f "$HOME/.local/share/linux-lab/lesson-runner-lib.sh" ]; then
+  # Installed layout: the executable lives in ~/.local/bin, the library in share.
+  . "$HOME/.local/share/linux-lab/lesson-runner-lib.sh"
+else
+  . "$SCRIPT_DIR/lesson-runner-lib.sh"
+fi
+
+main() {
+  local topic="${1:-}"
+
+  if [ -z "$topic" ]; then
+    linux_lab_lesson_usage
+    exit 1
+  fi
+
+  linux_lab_run_lesson "$HOME/linux-lab/tasks/$topic"
+}
+
+main "$@"

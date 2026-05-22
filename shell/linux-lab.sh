@@ -56,6 +56,7 @@ h() {
     echo "  hman tar       русская man-страница"
     echo "  hs archive     поиск по описаниям man"
     echo "  lab            список учебных тем"
+    echo "  lesson 01-files  интерактивный lesson runner"
     echo "  ports          открытые порты"
     echo "  ip4            IP-адреса"
     return
@@ -121,6 +122,7 @@ lab() {
   echo "  h find"
   echo "  hman chmod"
   echo "  hs network"
+  echo "  lesson 01-files"
 }
 
 menu() {
@@ -132,12 +134,13 @@ menu() {
     echo '1) Открыть README учебного полигона'
     echo '2) Показать список тем'
     echo '3) Перейти в 01-files'
-    echo '4) Выбрать тему вручную'
-    echo '5) Перейти в ~/linux-lab'
-    echo '6) Показать команды помощи'
-    echo '7) Выход из меню'
+    echo '4) Запустить lesson runner'
+    echo '5) Выбрать тему вручную'
+    echo '6) Перейти в ~/linux-lab'
+    echo '7) Показать команды помощи'
+    echo '8) Выход из меню'
     echo
-    read -r -p 'Выбери пункт [1-7] (Enter = выход): ' choice
+    read -r -p 'Выбери пункт [1-8] (Enter = выход): ' choice
 
     case "$choice" in
       1)
@@ -157,9 +160,28 @@ menu() {
         echo '  bash setup.sh'
         echo "  sed -n '1,200p' lesson.md"
         echo "  sed -n '1,240p' practice.md"
+        echo '  lesson 01-files'
         break
         ;;
       4)
+        echo 'Доступные темы для runner:'
+        if [ -d "$HOME/linux-lab/tasks" ]; then
+          find "$HOME/linux-lab/tasks" -mindepth 2 -maxdepth 2 -name runner.txt -print | sed 's#^.*/tasks/##; s#/runner.txt$##' | sort
+        else
+          echo '  01-files'
+        fi
+        read -r -p 'Введи имя темы: ' topic
+        if [ -z "$topic" ]; then
+          echo 'Тема не указана.'
+        elif command -v lesson >/dev/null 2>&1; then
+          lesson "$topic"
+        elif [ -x "$HOME/.local/bin/lesson" ]; then
+          "$HOME/.local/bin/lesson" "$topic"
+        else
+          echo 'Команда lesson пока не установлена. Запусти install.sh и открой новую shell-сессию.'
+        fi
+        ;;
+      5)
         echo 'Доступные темы:'
         echo '  01-files'
         echo '  02-permissions'
@@ -182,19 +204,19 @@ menu() {
           echo 'Неизвестная тема. Попробуй еще раз.'
         fi
         ;;
-      5)
+      6)
         cd "$HOME/linux-lab" || return 1
         echo 'Ты в ~/linux-lab'
         break
         ;;
-      6)
+      7)
         h
         ;;
-      7|'')
+      8|'')
         break
         ;;
       *)
-        echo 'Неизвестный пункт. Выбери число от 1 до 7.'
+        echo 'Неизвестный пункт. Выбери число от 1 до 8.'
         ;;
     esac
   done

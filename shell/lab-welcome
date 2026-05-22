@@ -34,12 +34,14 @@ echo "  3. Запусти setup.sh"
 echo "  4. Выполни задания из practice.md"
 echo "  5. Сверься с checks.md"
 echo "  6. Запусти verify.sh"
+echo "  Или выбери интерактивный режим: lesson 01-files"
 echo ""
 echo "Короткий пример:"
 echo "  cd ~/linux-lab/tasks/01-files"
 echo "  bash setup.sh"
 echo "  sed -n '1,200p' lesson.md"
 echo "  sed -n '1,240p' practice.md"
+echo "  lesson 01-files"
 echo "  bash verify.sh"
 echo
 
@@ -69,4 +71,3 @@ echo
 echo "Перед опасными экспериментами:"
 echo "  Сделай snapshot в Proxmox."
 echo
-

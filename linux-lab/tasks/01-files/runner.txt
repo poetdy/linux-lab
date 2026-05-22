@@ -1,0 +1,129 @@
+TITLE: 01-files
+INTRO: Ты работаешь в теме про файлы и директории внутри Linux Lab.
+INTRO: Runner сам готовит среду темы и переводит тебя в `~/linux-lab/sandbox/files-lab`, если эта папка еще не подготовлена.
+INTRO: На ранних шагах runner мягко тренирует нужную команду, а позже больше смотрит на результат.
+INTRO: В любой момент можно ввести `hint`, `help`, `explain`, `check`, `skip` или `quit`.
+COMMANDS: pwd ls find du sort mkdir mv cp tar
+SETUP_CMD: bash "$HOME/linux-lab/tasks/01-files/setup.sh"
+WORKDIR: $HOME/linux-lab/sandbox/files-lab
+
+STEP: warmup-pwd
+MODE: guided
+TASK: Покажи текущую директорию.
+EXPECTED_COMMANDS: pwd
+HINT: Нужна короткая команда, которая печатает путь каталога, где ты находишься сейчас.
+HELP_TOPIC: pwd
+EXPLAIN: `pwd` расшифровывается как print working directory и помогает убедиться, что ты работаешь в нужном месте.
+CHECK_TYPE: command_contains
+CHECK_PATTERN: pwd
+
+STEP: warmup-list-hidden
+MODE: guided
+TASK: Выведи полный список файлов, включая скрытые.
+EXPECTED_COMMANDS: ls
+HINT: Вспомни команду просмотра содержимого каталога и флаг, который показывает элементы с точкой в имени.
+HELP_TOPIC: ls
+EXPLAIN: Скрытые файлы и каталоги в Linux начинаются с точки, поэтому для проверки окружения часто нужен именно `ls -a` или близкий вариант.
+CHECK_TYPE: command_regex
+CHECK_PATTERN: ^ls\b.*(\s-a\b|\s-la\b|\s-al\b|\s-lah\b|\s-lha\b|\s-ahl\b|--all)
+
+STEP: warmup-find-logs
+MODE: guided
+TASK: Найди все файлы с расширением `.log` в текущей теме.
+EXPECTED_COMMANDS: find
+HINT: Здесь важна не просто выдача списка, а тренировка команды поиска по маске имени.
+HELP_TOPIC: find
+EXPLAIN: `find` удобен, когда файлов и вложенных каталогов много. Для этой задачи обычно задают стартовую точку `.` и маску имени вроде `*.log`.
+CHECK_TYPE: command_regex
+CHECK_PATTERN: ^find\b.*\.log
+
+STEP: warmup-heavy-directory
+MODE: guided
+TASK: Определи самый тяжелый каталог в текущей директории.
+EXPECTED_COMMANDS: du sort
+HINT: Сначала получи размеры элементов в каталоге, потом отсортируй их по размеру.
+HELP_TOPIC: du
+EXPLAIN: Связка `du` и `sort -h` помогает быстро увидеть, какие папки занимают больше всего места.
+CHECK_TYPE: command_regex
+CHECK_PATTERN: ^du\b.*sort\b.*-h
+
+STEP: create-organized-tree
+MODE: guided
+TASK: Создай структуру `organized/docs`, `organized/images`, `organized/logs`, `organized/archive`.
+EXPECTED_COMMANDS: mkdir
+HINT: Команда создания каталогов умеет сразу строить вложенную структуру, если добавить правильный флаг.
+HELP_TOPIC: mkdir
+EXPLAIN: Для таких задач удобно создавать всю цепочку каталогов одной командой, чтобы не заводить каждую папку отдельно.
+CHECK_TYPE: path_exists
+CHECK_PATH: organized/archive
+CHECK_PATHS: organized/docs organized/images organized/logs organized/archive
+
+STEP: move-text-files
+MODE: flex
+TASK: Перемести все `.txt` файлы в `organized/docs`.
+EXPECTED_COMMANDS: mv find
+ALLOW_ALTERNATIVES: yes
+HINT: Можно сначала найти нужные документы, а можно использовать шаблон имени, если понимаешь, из какой точки запускаешь команду.
+HELP_TOPIC: mv
+EXPLAIN: На этом шаге важнее корректный результат. `mv` здесь тренирует перенос файлов, а `find` помогает, если текстовые файлы лежат не на одном уровне.
+CHECK_TYPE: moved_matches
+CHECK_GLOB: organized/docs/*.txt
+CHECK_MIN_COUNT: 3
+
+STEP: move-image-files
+MODE: flex
+TASK: Перемести все `.jpg` и `.png` файлы в `organized/images`.
+EXPECTED_COMMANDS: mv find
+ALLOW_ALTERNATIVES: yes
+HINT: Подумай, как одним действием обработать два расширения или как выполнить два аккуратных переноса подряд.
+HELP_TOPIC: mv
+EXPLAIN: Поздние шаги допускают разные корректные подходы, если изображения в итоге оказываются в `organized/images`.
+CHECK_TYPE: moved_matches
+CHECK_GLOBS: organized/images/*.jpg;organized/images/*.png
+CHECK_MIN_COUNT: 2
+
+STEP: move-log-files
+MODE: flex
+TASK: Перемести все `.log` файлы в `organized/logs`.
+EXPECTED_COMMANDS: mv find
+ALLOW_ALTERNATIVES: yes
+HINT: Это тот же паттерн, что и для текстовых файлов: сначала определить набор файлов, затем перенести их в целевой каталог.
+HELP_TOPIC: mv
+EXPLAIN: Полезно замечать повторяющиеся приемы. Если ты уже умеешь находить и перемещать одну группу файлов, тот же навык переносится на логи.
+CHECK_TYPE: moved_matches
+CHECK_GLOB: organized/logs/*.log
+CHECK_MIN_COUNT: 2
+
+STEP: copy-report
+MODE: flex
+TASK: Найди `report-final.txt` и скопируй его в `organized/archive`.
+EXPECTED_COMMANDS: cp find
+HINT: Здесь нужен именно перенос копии, а не перемещение исходника.
+HELP_TOPIC: cp
+EXPLAIN: Шаг разделяет роли `cp` и `mv`: исходный файл должен остаться на месте, а в архивной папке должна появиться его копия.
+CHECK_TYPE: path_exists
+CHECK_PATH: organized/archive/report-final.txt
+CHECK_PATHS: organized/archive/report-final.txt organized/docs/report-final.txt
+
+STEP: create-archive
+MODE: guided
+TASK: Создай архив `organized.tar.gz` из каталога `organized`.
+EXPECTED_COMMANDS: tar
+HINT: Нужна команда архиватора с флагами для создания gzip-архива.
+HELP_TOPIC: tar
+EXPLAIN: `tar -czf` упаковывает каталог в `.tar.gz` и часто используется как финальный шаг после подготовки структуры.
+CHECK_TYPE: command_regex
+CHECK_PATTERN: ^tar\b.*(-c|-czf|-cf|czf|cf).*(organized\.tar\.gz).*(organized)
+CHECK_PATH: organized.tar.gz
+
+STEP: inspect-archive
+MODE: guided
+TASK: Проверь содержимое архива без распаковки.
+EXPECTED_COMMANDS: tar
+HINT: У `tar` есть режим просмотра списка файлов внутри уже созданного архива.
+HELP_TOPIC: tar
+EXPLAIN: Проверка через `tar -tf` подтверждает, что архив собран правильно, и избавляет от сюрпризов при дальнейшей передаче или хранении.
+CHECK_TYPE: command_regex
+CHECK_PATTERN: ^tar\b.*(-t|-tf|tf).*(organized\.tar\.gz)
+CHECK_ARCHIVE: organized.tar.gz
+CHECK_ARCHIVE_PATTERN: ^organized/
